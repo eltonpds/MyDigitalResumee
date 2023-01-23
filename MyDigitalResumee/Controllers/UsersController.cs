@@ -98,13 +98,13 @@ namespace MyDigitalResumee.Api.Controllers
         ///         "name": "string",
         ///         "email": "string",
         ///         "password": "string",
-        ///         "gender": 0,
+        ///         "gender": 0, // 0 = masculino, 1 = feminino, 2 = não informado
         ///         "cpf": "string",
         ///         "address": "string",
         ///         "state": "string",
         ///         "country": "string",
         ///         "office": "string",
-        ///         "salaryClaim": 0
+        ///         "salaryClaim": 2500.00
         ///     }
         ///
         /// </remarks>
@@ -141,6 +141,33 @@ namespace MyDigitalResumee.Api.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Realizar login no sistema passando o email e senha
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        /// <response code="200">Retorna o e-mail e senha do usuário</response>
+        /// <response code="400">Nenhum usuário encontrado</response>
+        [HttpPost("login")]
+        public async Task<ActionResult<User>> Login(string email, string password)
+        {
+            try
+            {
+                var user = await _context.Users.SingleAsync<User>(u => u.Email == email && u.Password == password);
+                if (user is null)
+                {
+                    return NotFound();
+                }
+
+                return user;
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest("Email e/ou senha incorreto/s");
+            }
         }
 
         private bool UserExists(int id)
